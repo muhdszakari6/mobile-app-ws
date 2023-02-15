@@ -1,5 +1,6 @@
 package com.appsdeveloperblog.app.ws.controller;
 
+import com.appsdeveloperblog.app.ws.ui.model.request.UserDetailsRequestModel;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -10,7 +11,7 @@ public class UserController {
         return "Get user was called";
     }
     @PostMapping
-    public String createUser() {
+    public String createUser(@RequestBody UserDetailsRequestModel userDetails) {
         return "Create user was called";
     }
     @PutMapping
