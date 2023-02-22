@@ -7,6 +7,7 @@ import jakarta.persistence.Id;
 
 import java.io.Serial;
 import java.io.Serializable;
+
 @Entity(name="users")
 public class UserEntity implements Serializable {
 
