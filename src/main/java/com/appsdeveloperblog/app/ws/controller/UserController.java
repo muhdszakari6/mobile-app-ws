@@ -13,9 +13,12 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
     @Autowired
     UserService userService;
-    @GetMapping
-    public String getUser(){
-        return "Get user was called";
+    @GetMapping(path="/{id}")
+    public UserRest getUser(@PathVariable String id){
+        UserRest returnValue = new UserRest();
+        UserDto user = userService.getUserByUserId(id);
+        BeanUtils.copyProperties(user, returnValue);
+        return returnValue;
     }
     @PostMapping
     public UserRest createUser(@RequestBody UserDetailsRequestModel userDetails) {
