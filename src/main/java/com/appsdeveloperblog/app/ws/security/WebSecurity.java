@@ -52,6 +52,9 @@ public class WebSecurity{
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
+        http.headers().frameOptions().disable();
+
+
         return http.build();
     }
 }
