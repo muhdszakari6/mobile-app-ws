@@ -15,13 +15,15 @@ repositories {
 }
 
 dependencies {
-	implementation 'javax.xml.bind:jaxb-api:2.3.1'
+	implementation 'javax.xml.bind:jaxb-api:2.4.0-b180830.0359'
 	implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.14.2'
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'io.jsonwebtoken:jjwt:0.9.1'
+	implementation 'org.modelmapper:modelmapper:3.1.1'
+	implementation 'com.amazonaws:aws-java-sdk-ses:1.12.454'
 	implementation 'org.springframework.boot:spring-boot-devtools'
 	runtimeOnly 'com.mysql:mysql-connector-j'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'

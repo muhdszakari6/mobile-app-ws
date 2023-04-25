@@ -4,10 +4,12 @@ import com.appsdeveloperblog.app.ws.exception.UserServiceException;
 import com.appsdeveloperblog.app.ws.io.entity.UserEntity;
 import com.appsdeveloperblog.app.ws.repository.UserRepository;
 import com.appsdeveloperblog.app.ws.service.UserService;
+import com.appsdeveloperblog.app.ws.shared.dto.AddressDTO;
 import com.appsdeveloperblog.app.ws.shared.dto.UserDto;
 import com.appsdeveloperblog.app.ws.shared.dto.Utils;
 import com.appsdeveloperblog.app.ws.ui.model.response.ErrorMessages;
 import com.appsdeveloperblog.app.ws.ui.model.response.UserRest;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -40,8 +42,16 @@ public class  UserServiceImpl implements UserService {
             throw new RuntimeException("Record already exists");
         }
 
-        UserEntity userEntity = new UserEntity();
-        BeanUtils.copyProperties(user, userEntity);
+        for (int i = 0; i < user.getAddresses().size(); i++) {
+            AddressDTO addressDTO = user.getAddresses().get(i);
+            addressDTO.setUserDetails(user);
+            addressDTO.setAddressId(utils.generateAddressId(30));
+            user.getAddresses().set(i, addressDTO);
+        }
+
+        ModelMapper modelMapper = new ModelMapper();
+        UserEntity userEntity = modelMapper.map(user, UserEntity.class);
+
 
         String publicUserId = utils.generateUserId(30);
         userEntity.setUserId(publicUserId);
@@ -49,7 +59,7 @@ public class  UserServiceImpl implements UserService {
 
         UserEntity storedUser = userRepository.save(userEntity);
         UserDto returnValue = new UserDto();
-        BeanUtils.copyProperties(storedUser, returnValue);
+        returnValue = modelMapper.map(storedUser, UserDto.class);
 
         return returnValue;
     }
@@ -91,11 +101,11 @@ public class  UserServiceImpl implements UserService {
         if(usersPage.getContent().isEmpty())
             throw new UserServiceException(ErrorMessages.NO_RECORD_ON_PAGE.getErrorMessage());
         List<UserEntity> users = usersPage.getContent();
+        ModelMapper modelMapper = new ModelMapper();
         UserDto userDto;
         for (UserEntity userEntity:users) {
-           userDto = new UserDto();
-           BeanUtils.copyProperties(userEntity, userDto);
-           returnValue.add(userDto);
+            userDto = modelMapper.map(userEntity, UserDto.class);
+            returnValue.add(userDto);
         }
 
         return returnValue;
@@ -119,7 +129,8 @@ public class  UserServiceImpl implements UserService {
         UserEntity userEntity = userRepository.findByUserId(userId);
         if(userEntity == null )
             throw new UserServiceException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage());
-        BeanUtils.copyProperties(userEntity,returnValue);
+        ModelMapper modelMapper = new ModelMapper();
+        returnValue = modelMapper.map(userEntity, UserDto.class);
         return returnValue;
     }
 

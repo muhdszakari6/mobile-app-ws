@@ -1,10 +1,23 @@
 package com.appsdeveloperblog.app.ws.ui.model.response;
 
+import com.appsdeveloperblog.app.ws.shared.dto.AddressDTO;
+
+import java.util.List;
+
 public class UserRest {
     private String userId;
     private String firstName;
     private String lastName;
     private String email;
+    private List<AddressRest> addresses;
+
+    public List<AddressRest> getAddresses() {
+        return addresses;
+    }
+
+    public void setAddresses(List<AddressRest> addresses) {
+        this.addresses = addresses;
+    }
 
     public String getUserId() {
         return userId;
