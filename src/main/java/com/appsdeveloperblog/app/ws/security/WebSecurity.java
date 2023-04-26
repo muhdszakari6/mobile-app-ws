@@ -41,9 +41,12 @@ public class WebSecurity{
         http
                 .csrf().disable()
                 .authorizeHttpRequests()
+
                 .requestMatchers(HttpMethod.POST, SecurityConstants.SIGN_UP_URL)
                 .permitAll()
                 .requestMatchers(HttpMethod.POST, "/login")
+                .permitAll()
+                .requestMatchers(HttpMethod.GET, SecurityConstants.VERIFICATION_URL)
                 .permitAll()
                 .anyRequest().authenticated().and()
                 .addFilter(getAuthenticationFilter(authenticationManager))
