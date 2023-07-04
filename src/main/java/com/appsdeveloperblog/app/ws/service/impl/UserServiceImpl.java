@@ -1,7 +1,9 @@
 package com.appsdeveloperblog.app.ws.service.impl;
 
 import com.appsdeveloperblog.app.ws.exception.UserServiceException;
+import com.appsdeveloperblog.app.ws.io.entity.PasswordResetTokenEntity;
 import com.appsdeveloperblog.app.ws.io.entity.UserEntity;
+import com.appsdeveloperblog.app.ws.repository.PasswordResetTokenRepository;
 import com.appsdeveloperblog.app.ws.repository.UserRepository;
 import com.appsdeveloperblog.app.ws.service.UserService;
 import com.appsdeveloperblog.app.ws.shared.dto.AddressDTO;
@@ -34,6 +36,8 @@ import java.util.List;
 public class  UserServiceImpl implements UserService {
     @Autowired
     UserRepository userRepository;
+    @Autowired
+    PasswordResetTokenRepository passwordResetTokenRepository;
     @Autowired
     Utils utils;
     @Autowired
@@ -164,4 +168,51 @@ public class  UserServiceImpl implements UserService {
         return new User(userEntity.getEmail(), userEntity.getEncryptedPassword(), userEntity.getEmailVerificationStatus(),true,
         true, true,new ArrayList<>());
     }
+    @Override
+    public boolean requestPasswordReset(String email) {
+        Boolean returnValue = false;
+        UserEntity userEntity = userRepository.findByEmail(email);
+        if(userEntity==null){
+            return returnValue;
+        }
+        String token = Utils.generatePasswordResetRequest(userEntity.getUserId());
+        PasswordResetTokenEntity passwordResetTokenEntity = new PasswordResetTokenEntity();
+        passwordResetTokenEntity.setToken(token);
+        passwordResetTokenEntity.setUserDetails(userEntity);
+        passwordResetTokenRepository.save(passwordResetTokenEntity);
+
+        returnValue = new AmazonSES().sendPasswordResetRequest(
+                userEntity.getFirstName(),
+                userEntity.getEmail(),
+                token
+        );
+
+        return returnValue;
+    }
+
+    @Override
+    public boolean resetPassword(String token, String password) {
+        Boolean returnValue = false;
+        if(Utils.hasTokenExpired(token)){
+            return returnValue;
+        }
+
+        PasswordResetTokenEntity passwordResetTokenEntity = passwordResetTokenRepository.findByToken(token);
+        if(passwordResetTokenEntity == null){
+            return returnValue;
+        }
+
+        String encodedPassword = bCryptPasswordEncoder.encode(password);
+        UserEntity userEntity = passwordResetTokenEntity.getUserDetails();
+        userEntity.setEncryptedPassword(encodedPassword);
+        UserEntity savedUserEntity = userRepository.save(userEntity);
+
+        if(savedUserEntity != null && savedUserEntity.getEncryptedPassword().equals(encodedPassword)){
+            returnValue = true;
+        }
+        passwordResetTokenRepository.delete(passwordResetTokenEntity);
+        return returnValue;
+    }
+
+
 }

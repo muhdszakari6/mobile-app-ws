@@ -1,22 +1,13 @@
 package com.appsdeveloperblog.app.ws.ui.model.request;
 
 public class PasswordRequestResetModel {
-    private String password;
-    private String confirmPassword;
+    private String email;
 
-    public String getPassword() {
-        return password;
+    public String getEmail() {
+        return email;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getConfirmPassword() {
-        return confirmPassword;
-    }
-
-    public void setConfirmPassword(String confirmPassword) {
-        this.confirmPassword = confirmPassword;
+    public void setEmail(String email) {
+        this.email = email;
     }
 }
