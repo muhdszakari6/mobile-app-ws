@@ -64,14 +64,14 @@ public class  UserServiceImpl implements UserService {
         userEntity.setUserId(publicUserId);
         userEntity.setEncryptedPassword(bCryptPasswordEncoder.encode(user.getPassword()));
 
-        userEntity.setEmailVerificationToken(Utils.generateEmailVerificationToken(publicUserId));
+        userEntity.setEmailVerificationToken(utils.generateEmailVerificationToken(publicUserId));
         userEntity.setEmailVerificationStatus(Boolean.FALSE);
 
         UserEntity storedUser = userRepository.save(userEntity);
         UserDto returnValue = new UserDto();
         returnValue = modelMapper.map(storedUser, UserDto.class);
 
-        new AmazonSES().verifyEmail(returnValue);
+//        new AmazonSES().verifyEmail(returnValue);
         return returnValue;
     }
 

@@ -22,7 +22,7 @@ public class Utils {
     private final Random RANDOM = new SecureRandom();
     private final String ALPHABET = "1023456778990qwertiyouasdghfjgkh";
 
-    public static String generateEmailVerificationToken(String publicUserId) {
+    public String generateEmailVerificationToken(String publicUserId) {
         String token = Jwts.builder()
                 .setSubject(publicUserId)
                 .setExpiration(new Date(System.currentTimeMillis() + SecurityConstants.EXPIRATION_TIME))

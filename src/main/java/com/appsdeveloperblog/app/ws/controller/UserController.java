@@ -32,7 +32,9 @@ public class UserController {
     public UserRest getUser(@PathVariable String id){
         UserRest returnValue = new UserRest();
         UserDto user = userService.getUserByUserId(id);
-        BeanUtils.copyProperties(user, returnValue);
+
+        ModelMapper modelMapper = new ModelMapper();
+        returnValue = modelMapper.map(user, UserRest.class);
         return returnValue;
     }
     @PostMapping(
