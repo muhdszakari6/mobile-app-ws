@@ -52,6 +52,8 @@ public class WebSecurity{
                 .permitAll()
                 .requestMatchers(HttpMethod.POST, SecurityConstants.PASSWORD_RESET_URL)
                 .permitAll()
+                .requestMatchers(HttpMethod.POST, SecurityConstants.H2_CONSOLE)
+                .permitAll()
                 .anyRequest().authenticated().and()
                 .addFilter(getAuthenticationFilter(authenticationManager))
                 .addFilter(new AuthorizationFilter(authenticationManager))
