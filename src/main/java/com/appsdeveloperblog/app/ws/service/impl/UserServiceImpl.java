@@ -46,7 +46,7 @@ public class  UserServiceImpl implements UserService {
     public UserDto createUser(UserDto user) {
         UserEntity storedUserInDb = userRepository.findByEmail(user.getEmail());
         if(storedUserInDb != null){
-            throw new RuntimeException("Record already exists");
+            throw new UserServiceException("Record already exists");
         }
 
         for (int i = 0; i < user.getAddresses().size(); i++) {
@@ -165,8 +165,10 @@ public class  UserServiceImpl implements UserService {
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         UserEntity userEntity = userRepository.findByEmail(email);
         if(userEntity == null) throw new UsernameNotFoundException(email);
-        return new User(userEntity.getEmail(), userEntity.getEncryptedPassword(), userEntity.getEmailVerificationStatus(),true,
-        true, true,new ArrayList<>());
+//        return new User(userEntity.getEmail(), userEntity.getEncryptedPassword(), userEntity.getEmailVerificationStatus(),true,
+//        true, true,new ArrayList<>());
+        return new User(userEntity.getEmail(), userEntity.getEncryptedPassword(), true,true,
+                true, true,new ArrayList<>());
     }
     @Override
     public boolean requestPasswordReset(String email) {

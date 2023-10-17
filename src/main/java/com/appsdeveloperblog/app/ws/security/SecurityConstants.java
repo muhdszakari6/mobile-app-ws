@@ -1,6 +1,7 @@
 package com.appsdeveloperblog.app.ws.security;
 
 import com.appsdeveloperblog.app.ws.SpringApplicationContext;
+import org.springframework.core.env.Environment;
 
 public class SecurityConstants {
     public static final long EXPIRATION_TIME = 864000000;
@@ -12,7 +13,7 @@ public class SecurityConstants {
     public static final String PASSWORD_RESET_URL = "/users/password-reset";
     public static final String H2_CONSOLE = "/h2-console/**";
     public static String getTokenSecret(){
-        AppProperties appProperties = (AppProperties) SpringApplicationContext.getBean("appProperties");
-        return appProperties.getTokenSecret();
+        Environment environment = (Environment) SpringApplicationContext.getBean("environment");
+        return environment.getProperty("tokenSecret");
     }
 }
