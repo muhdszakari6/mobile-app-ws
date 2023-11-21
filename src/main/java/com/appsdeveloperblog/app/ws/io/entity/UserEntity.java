@@ -4,9 +4,10 @@ import jakarta.persistence.*;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.List;
-
-@Entity(name="users")
+@Entity
+@Table(name="users")
 public class UserEntity implements Serializable {
 
     @Serial
@@ -30,6 +31,21 @@ public class UserEntity implements Serializable {
 
     @OneToMany(mappedBy = "userDetails", cascade = CascadeType.ALL)
     private List<AddressEntity> addresses;
+
+    @ManyToMany(cascade = {CascadeType.PERSIST}, fetch = FetchType.EAGER)
+    @JoinTable(name="users_roles",
+            joinColumns = @JoinColumn(name="users_id",referencedColumnName = "id") ,
+            inverseJoinColumns = @JoinColumn(name="roles_id", referencedColumnName = "id") )
+    private Collection<RoleEntity> roles;
+
+    public Collection<RoleEntity> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(Collection<RoleEntity> roles) {
+        this.roles = roles;
+    }
+
     public List<AddressEntity> getAddresses() {
         return addresses;
     }

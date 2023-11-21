@@ -15,10 +15,15 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.access.prepost.PostAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 
 @RestController
@@ -28,6 +33,8 @@ public class UserController {
     UserService userService;
     @Autowired
     AddressService addressService;
+
+    @PostAuthorize("hasRole('ADMIN') or returnObject.userId == principal.userId")
     @GetMapping(path="/{id}", produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
     public UserRest getUser(@PathVariable String id){
         UserRest returnValue = new UserRest();
@@ -46,6 +53,7 @@ public class UserController {
 
         ModelMapper modelMapper = new ModelMapper();
         UserDto userDto = modelMapper.map(userDetails, UserDto.class);
+        userDto.setRoles(new HashSet<>(Arrays.asList("ROLE_USER")));
 
         UserDto createdUser = userService.createUser(userDto);
         returnValue = modelMapper.map(createdUser, UserRest.class);
@@ -73,6 +81,9 @@ public class UserController {
         return returnValue;
     }
 
+//    @Secured("ROLE_ADMIN")
+//    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or #id == principal.userId")
     @DeleteMapping(
             path="/{id}",
             consumes = {MediaType.APPLICATION_JSON_VALUE},

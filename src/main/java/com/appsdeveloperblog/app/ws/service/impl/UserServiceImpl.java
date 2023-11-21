@@ -2,9 +2,12 @@ package com.appsdeveloperblog.app.ws.service.impl;
 
 import com.appsdeveloperblog.app.ws.exception.UserServiceException;
 import com.appsdeveloperblog.app.ws.io.entity.PasswordResetTokenEntity;
+import com.appsdeveloperblog.app.ws.io.entity.RoleEntity;
 import com.appsdeveloperblog.app.ws.io.entity.UserEntity;
 import com.appsdeveloperblog.app.ws.repository.PasswordResetTokenRepository;
+import com.appsdeveloperblog.app.ws.repository.RoleRepository;
 import com.appsdeveloperblog.app.ws.repository.UserRepository;
+import com.appsdeveloperblog.app.ws.security.UserPrincipal;
 import com.appsdeveloperblog.app.ws.service.UserService;
 import com.appsdeveloperblog.app.ws.shared.dto.AddressDTO;
 import com.appsdeveloperblog.app.ws.shared.dto.AmazonSES;
@@ -30,12 +33,15 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 
 @Service
 public class  UserServiceImpl implements UserService {
     @Autowired
     UserRepository userRepository;
+    @Autowired
+    RoleRepository roleRepository;
     @Autowired
     PasswordResetTokenRepository passwordResetTokenRepository;
     @Autowired
@@ -66,6 +72,18 @@ public class  UserServiceImpl implements UserService {
 
         userEntity.setEmailVerificationToken(utils.generateEmailVerificationToken(publicUserId));
         userEntity.setEmailVerificationStatus(Boolean.FALSE);
+
+        //Set roles
+        Collection<RoleEntity> roleEntities = new HashSet<>();
+
+        for(String role: user.getRoles()){
+            RoleEntity roleEntity = roleRepository.findByName(role);
+            if(roleEntity != null){
+                roleEntities.add(roleEntity);
+            }
+        }
+
+        userEntity.setRoles(roleEntities);
 
         UserEntity storedUser = userRepository.save(userEntity);
         UserDto returnValue = new UserDto();
@@ -167,9 +185,14 @@ public class  UserServiceImpl implements UserService {
         if(userEntity == null) throw new UsernameNotFoundException(email);
 //        return new User(userEntity.getEmail(), userEntity.getEncryptedPassword(), userEntity.getEmailVerificationStatus(),true,
 //        true, true,new ArrayList<>());
-        return new User(userEntity.getEmail(), userEntity.getEncryptedPassword(), true,true,
-                true, true,new ArrayList<>());
+//        return new User(userEntity.getEmail(), userEntity.getEncryptedPassword(), true,true,
+//                true, true,new ArrayList<>());
+        return new UserPrincipal(userEntity);
+
     }
+
+
+
     @Override
     public boolean requestPasswordReset(String email) {
         Boolean returnValue = false;

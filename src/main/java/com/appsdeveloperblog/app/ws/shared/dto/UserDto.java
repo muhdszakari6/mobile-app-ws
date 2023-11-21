@@ -1,7 +1,10 @@
 package com.appsdeveloperblog.app.ws.shared.dto;
 
+import com.appsdeveloperblog.app.ws.io.entity.RoleEntity;
+
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.List;
 
 public class UserDto implements Serializable {
@@ -16,6 +19,17 @@ public class UserDto implements Serializable {
     private String encryptedPassword;
     private String emailVerificationToken;
     private Boolean emailVerificationStatus=false;
+
+    private Collection<String> roles;
+
+    public Collection<String> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(Collection<String> roles) {
+        this.roles = roles;
+    }
+
     private List<AddressDTO> addresses;
     public List<AddressDTO> getAddresses() {
         return addresses;

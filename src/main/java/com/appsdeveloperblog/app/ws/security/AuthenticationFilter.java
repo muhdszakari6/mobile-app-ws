@@ -68,7 +68,7 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
         SecretKey secretKey = new SecretKeySpec(secretKeyBytes, SignatureAlgorithm.HS512.getJcaName());
         Instant now = Instant.now();
 
-        String userName = ((User) auth.getPrincipal()).getUsername();
+        String userName = ((UserPrincipal) auth.getPrincipal()).getUsername();
         String token = Jwts.builder()
                 .setSubject(userName)
                 .setExpiration(Date.from(now.plusMillis(SecurityConstants.EXPIRATION_TIME)))
@@ -79,7 +79,7 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
         UserService userService = (UserService) SpringApplicationContext.getBean("userServiceImpl");
         UserDto userDto = userService.getUser(userName);
 
-        res.addHeader(SecurityConstants.HEADER_STRING, SecurityConstants.TOKEN_PREFIX + token);
+        res.addHeader(SecurityConstants.HEADER_STRING,token);
         res.addHeader("UserID", userDto.getUserId());
         res.getWriter().write(token);
     }

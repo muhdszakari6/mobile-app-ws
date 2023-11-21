@@ -1,6 +1,8 @@
 package com.appsdeveloperblog.app.ws.security;
 
 import com.amazonaws.util.Base64;
+import com.appsdeveloperblog.app.ws.io.entity.UserEntity;
+import com.appsdeveloperblog.app.ws.repository.UserRepository;
 import io.jsonwebtoken.*;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -18,8 +20,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 public class AuthorizationFilter extends BasicAuthenticationFilter {
-    public AuthorizationFilter(AuthenticationManager authenticationManager) {
+    private final UserRepository userRepository;
+    public AuthorizationFilter(AuthenticationManager authenticationManager, UserRepository userRepository) {
         super(authenticationManager);
+        this.userRepository = userRepository;
     }
 
   @Override
@@ -44,7 +48,7 @@ public class AuthorizationFilter extends BasicAuthenticationFilter {
         if(authorizationHeader==null){
             return null;
         }
-        String token = req.getHeader(SecurityConstants.TOKEN_PREFIX);
+        String token = authorizationHeader.replace(SecurityConstants.TOKEN_PREFIX,"");
 
         byte[] secretKeyBytes = Base64.encode(SecurityConstants.getTokenSecret().getBytes());
         SecretKey secretKey = new SecretKeySpec(secretKeyBytes, SignatureAlgorithm.HS512.getJcaName());
@@ -56,7 +60,10 @@ public class AuthorizationFilter extends BasicAuthenticationFilter {
           return null;
       }
 
-      return new UsernamePasswordAuthenticationToken(subject, null,new ArrayList<>());
+      UserEntity userEntity = userRepository.findByEmail(subject);
+      if(userEntity == null) return null;
+      UserPrincipal userPrincipal = new UserPrincipal(userEntity);
+      return new UsernamePasswordAuthenticationToken(userPrincipal, null,userPrincipal.getAuthorities());
 
 //        if(token != null){
 //            token = token.replace(SecurityConstants.TOKEN_PREFIX,"");
